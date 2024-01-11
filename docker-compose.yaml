@@ -1,0 +1,47 @@
+version: '3'
+
+
+services:
+  backend:
+    # image: springboot:latest
+    build: 
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mypostgres
+    # volumes:
+    #   - ".:/app:rw"
+    networks:
+      spring-postgres:
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://mypostgres:5432/mydb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+      - SPRING_SECURITY_USER_NAME=sushil
+      - SPRING_SECURITY_USER_PASSWORD=sushil
+      - SPRING_SECURITY_USER_ROLES=ADMIN
+    stdin_open: true
+    tty: true
+  mypostgres:
+    image: postgres:13.0-alpine
+    restart: always
+    ports:
+     - "5432:5432"
+    environment:
+     - POSTGRES_PASSWORD=password
+     - POSTGRES_USER=postgres
+     - POSTGRES_DB=mydb
+    volumes:
+     - db-data:/var/lib/postgresql/data
+    networks:
+      spring-postgres:
+
+
+volumes:
+  db-data:
+  backend-data:
+networks:
+  spring-postgres:
